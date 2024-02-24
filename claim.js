@@ -43,12 +43,7 @@ const miningProgress = (detailUser) => {
 };
 
 const earned = (detailUser) => {
-  let hotPerHourInt = 0;
-  if (detailUser.boost != 99) {
-    hotPerHourInt = getHotPerHourInt(detailUser);
-  } else {
-    hotPerHourInt = (getHotPerHourInt(detailUser) / 2) * 10;
-  }
+  const hotPerHourInt = getHotPerHourInt(detailUser);
   const earned = (storageCapacityMs(detailUser) / 3600000) * hotPerHourInt;
 
   return earned;
@@ -56,8 +51,11 @@ const earned = (detailUser) => {
 
 const storageCapacityMs = (detailUser) => {
   const storageBooster = getBooster(detailUser.storage);
+  const fireplaceBooster = getBooster(detailUser.firespace);
 
-  return Math.floor(parseInt(storageBooster.value + "0") / 1e6);
+  return Math.floor(
+    parseInt(storageBooster.value / (fireplaceBooster.value / 10000) + "0") / 1e6
+  );
 };
 
 const getHotPerHourInt = (detailUser) => {
