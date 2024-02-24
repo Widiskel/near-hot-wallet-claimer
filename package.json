@@ -1,0 +1,21 @@
+{
+  "name": "near-hot-wallet-bot",
+  "version": "1.0.0",
+  "description": "Near hot wallet hot claimer",
+  "main": "claim.js",
+  "type":"module",
+  "scripts": {
+    "claim": "node claim.js"
+  },
+  "keywords": [
+    "near"
+  ],
+  "author": "Widiskel",
+  "license": "ISC",
+  "dependencies": {
+    "near-api-js": "^3.0.3",
+    "bignumber.js": "^9.1.2",
+    "node-fetch": "^3.3.2",
+    "twisters": "^1.1.0"
+  }
+}
