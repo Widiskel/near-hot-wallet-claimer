@@ -53,9 +53,12 @@ const storageCapacityMs = (detailUser) => {
   const storageBooster = getBooster(detailUser.storage);
   const fireplaceBooster = getBooster(detailUser.firespace);
 
-  return Math.floor(
-    parseInt(storageBooster.value / (fireplaceBooster.value / 100000) + "0") / 1e6
+  let earned = Math.floor(
+    (parseInt(storageBooster.value + "0") / 1e6) / (fireplaceBooster.value / 10000)
   );
+
+  earned = detailUser.boost == 99 ? earned*=10 : earned;
+  return earned;
 };
 
 const getHotPerHourInt = (detailUser) => {
