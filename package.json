@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Near hot wallet hot claimer",
   "main": "claim.js",
-  "type":"module",
+  "type": "module",
   "scripts": {
     "claim": "node claim.js"
   },
