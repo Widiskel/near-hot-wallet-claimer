@@ -107,6 +107,12 @@ export const levels = [
     mission: "",
     value: 50000,
   },
+  {
+    hot_price: 0,
+    id: 99,
+    mission: "",
+    value: 1,
+  },
 ];
 export const storeFireplace = [
   {
@@ -173,6 +179,7 @@ export const storeFireplace = [
     description: "Boost mining speed by\n1.5x.. 2x.. 3x times!",
     mission_text: "Send 0.5+ NEAR from .near account, created at HERE Wallet",
   },
+  
   {
     id: 14,
     title: "Uranium Boxes",
@@ -228,5 +235,12 @@ export const storeFireplace = [
     title: "Titanium Storage",
     text: "Better storage holds more HOT and you can claim it less often",
     description: "Increase the fill\ntime to claim less often",
+  },
+  {
+    id: 99,
+    title: "Rotted Wood",
+    text: "You were punished for using automatic mining. Your speed is reduced by 10 times",
+    description: "Makanya jangan pake auto mining, wkwkwk dinerf kan",
+    mission_text: "",
   },
 ];

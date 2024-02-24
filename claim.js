@@ -43,7 +43,12 @@ const miningProgress = (detailUser) => {
 };
 
 const earned = (detailUser) => {
-  const hotPerHourInt = getHotPerHourInt(detailUser);
+  let hotPerHourInt = 0;
+  if (detailUser.boost != 99) {
+    hotPerHourInt = getHotPerHourInt(detailUser);
+  } else {
+    hotPerHourInt = (getHotPerHourInt(detailUser) / 2) * 10;
+  }
   const earned = (storageCapacityMs(detailUser) / 3600000) * hotPerHourInt;
 
   return earned;
@@ -51,12 +56,15 @@ const earned = (detailUser) => {
 
 const storageCapacityMs = (detailUser) => {
   const storageBooster = getBooster(detailUser.storage);
+
   return Math.floor(parseInt(storageBooster.value + "0") / 1e6);
 };
 
 const getHotPerHourInt = (detailUser) => {
   const fireplaceBooster = getBooster(detailUser.firespace);
+
   const woodBooster = getBooster(detailUser.boost);
+
   return new BigNumber(woodBooster.value * fireplaceBooster.value).dividedBy(
     1e7
   );
@@ -87,9 +95,10 @@ const miningEarned = async (detailUser) => {
 };
 
 const getBooster = (e) => {
-  let booster = levels.find((t) => t.id === e);
+  let booster = levels.find((t) => t.id == e);
   if (!booster) return null;
-  let additionalInfo = storeFireplace.find((t) => t.id === e);
+  let additionalInfo = storeFireplace.find((t) => t.id == e);
+
   return additionalInfo ? { ...additionalInfo, ...booster } : booster;
 };
 
@@ -169,6 +178,7 @@ Status : Mining
 
       setTimeout(mineAndUpdate, 500);
     } catch (error) {
+      console.log(error);
       twisters.put(accountId, {
         active: false,
         text: `
