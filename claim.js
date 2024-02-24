@@ -54,7 +54,7 @@ const storageCapacityMs = (detailUser) => {
   const fireplaceBooster = getBooster(detailUser.firespace);
 
   return Math.floor(
-    parseInt(storageBooster.value / (fireplaceBooster.value / 10000) + "0") / 1e6
+    parseInt(storageBooster.value / (fireplaceBooster.value / 100000) + "0") / 1e6
   );
 };
 
