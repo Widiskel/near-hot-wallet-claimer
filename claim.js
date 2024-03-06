@@ -54,10 +54,12 @@ const storageCapacityMs = (detailUser) => {
   const fireplaceBooster = getBooster(detailUser.firespace);
 
   let earned = Math.floor(
-    (parseInt(storageBooster.value + "0") / 1e6) / (fireplaceBooster.value / 10000)
+    parseInt(storageBooster.value + "0") /
+      1e6 /
+      (fireplaceBooster.value / 10000)
   );
 
-  earned = detailUser.boost == 99 ? earned*=10 : earned;
+  earned = detailUser.boost == 99 ? (earned *= 10) : earned;
   return earned;
 };
 
@@ -131,6 +133,7 @@ Status : Claiming...
         });
 
         const account = await getAccount(accountId, privateKey);
+        await new Promise((resolve) => setTimeout(resolve, 5000));
         const callContract = await account.functionCall({
           contractId: "game.hot.tg",
           methodName: "claim",
