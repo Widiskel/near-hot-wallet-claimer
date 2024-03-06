@@ -1,9 +1,9 @@
 import { KeyPair, keyStores, connect, Near } from "near-api-js";
 import { Twisters } from "twisters";
 import BigNumber from "bignumber.js";
-import fs from "fs";
 import { levels, storeFireplace } from "./utils.js";
 import { mainnetConfig } from "./rpc.js";
+import { acc } from "./account.js";
 
 const near = new Near(mainnetConfig);
 const twisters = new Twisters();
@@ -198,10 +198,8 @@ Status : Error processing account, please check logs for details.
 };
 
 (async () => {
-  const accountsData = fs.readFileSync("./account.txt", "utf-8").split(/\r?\n/);
-
   const allPromise = [];
-  const promises = accountsData.map(async (account) => {
+  const promises = acc.map(async (account) => {
     const [accountId, privateKey] = account.split("|");
     processAccount(accountId, privateKey);
   });

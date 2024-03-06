@@ -6,7 +6,7 @@ LAVA Near HOT Wallet claimer for automatic claiming HOT token using Near/Lava ma
 - install nodejs.
 - cd to project dir.
 - run ```npm install```.
-- ceate file with name ```account.txt``` and add ur wallet deails with this format ```accountID|privateKEY``` , example ```test.near|akalsjfklasjfklasjfklasf```. it support multiple wallet
+- run ```cp account-temp.js account.js``` and add ur wallet deails with this format ```accountID|privateKEY``` , example ```test.near|akalsjfklasjfklasjfklasf```. it support multiple wallet
 so just write down like this
 ```
 test.near|akalsjfklasjfklasjfklasf
