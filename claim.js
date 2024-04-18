@@ -54,7 +54,7 @@ const getNearBalance = async (accountId, privateKey) => {
   return new BigNumber(Nearbalance.total).dividedBy(1e24);
 };
 
-const processAccount = async (accountId, privateKey) => {
+const processAccount = async (accountId, privateKey, delayInHours) => {
   while (true) {
     try {
       const mineAndUpdate = async () => {
@@ -117,7 +117,9 @@ Status : Mining...
 `,
         });
       };
-      await new Promise((resolve) => setTimeout(resolve, 2 * 3600 + 5 * 1000));
+      await new Promise((resolve) =>
+        setTimeout(resolve, delayInHours * 3600 + 5 * 1000)
+      );
 
       await mineAndUpdate();
     } catch (error) {
@@ -136,9 +138,9 @@ Status : Error ${error}...
 (async () => {
   const allPromise = [];
   const promises = acc.map(async (account) => {
-    const [accountId, privateKey] = account.split("|");
+    const [accountId, privateKey, delayInHours] = account.split("|");
 
-    processAccount(accountId, privateKey);
+    processAccount(accountId, privateKey, delayInHours);
   });
 
   for (const processAccount of promises) {

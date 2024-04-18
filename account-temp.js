@@ -1,3 +1,1 @@
-export const acc = [
-    "id|pk"
-]
+export const acc = ["id|pk|2"];
