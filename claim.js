@@ -112,11 +112,11 @@ Status : Claiming...
           text: `
   Account ID : ${accountId}
   Near Balance :${NearBalanceUser}
-  Status : Mining...
+  Status : Mining for ${delayInHours} Hours 5 Minutes...
   `,
         });
         await new Promise((resolve) =>
-          setTimeout(resolve, delayInHours * 3600 + 5 * 1000)
+          setTimeout(resolve, delayInHours * 3600 * 1000 + 5 * 60 * 1000)
         );
       };
 
