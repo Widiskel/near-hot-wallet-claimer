@@ -108,18 +108,17 @@ Status : Claiming...
             await new Promise((resolve) => setTimeout(resolve, 5000));
           }
         }
-
         twisters.put(accountId, {
           text: `
-Account ID : ${accountId}
-Near Balance :${NearBalanceUser}
-Status : Mining...
-`,
+  Account ID : ${accountId}
+  Near Balance :${NearBalanceUser}
+  Status : Mining...
+  `,
         });
+        await new Promise((resolve) =>
+          setTimeout(resolve, delayInHours * 3600 + 5 * 1000)
+        );
       };
-      await new Promise((resolve) =>
-        setTimeout(resolve, delayInHours * 3600 + 5 * 1000)
-      );
 
       await mineAndUpdate();
     } catch (error) {
