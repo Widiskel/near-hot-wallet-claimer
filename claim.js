@@ -1,7 +1,6 @@
 import { KeyPair, keyStores, connect, Near } from "near-api-js";
 import { Twisters } from "twisters";
 import BigNumber from "bignumber.js";
-import { levels, storeFireplace } from "./utils.js";
 import { mainnetConfig } from "./rpc.js";
 import { acc } from "./account.js";
 
@@ -31,48 +30,6 @@ const getAccount = (accountId, privateKey) =>
     }
   });
 
-const miningProgress = (detailUser) => {
-  const currentTime = Date.now();
-
-  const timeSinceLastClaimHours =
-    (currentTime - detailUser.last_claim / 1e6) / (1000 * 60 * 60);
-  const hotPerHourInt = getHotPerHourInt(detailUser);
-  const earnedHOT = timeSinceLastClaimHours * hotPerHourInt;
-
-  return earnedHOT.toFixed(6);
-};
-
-const earned = (detailUser) => {
-  const hotPerHourInt = getHotPerHourInt(detailUser);
-  const earned = (storageCapacityMs(detailUser) / 3600000) * hotPerHourInt;
-
-  return earned;
-};
-
-const storageCapacityMs = (detailUser) => {
-  const storageBooster = getBooster(detailUser.storage);
-  const fireplaceBooster = getBooster(detailUser.firespace);
-
-  let earned = Math.floor(
-    parseInt(storageBooster.value + "0") /
-      1e6 /
-      (fireplaceBooster.value / 10000)
-  );
-
-  earned = detailUser.boost == 99 ? (earned *= 10) : earned;
-  return earned;
-};
-
-const getHotPerHourInt = (detailUser) => {
-  const fireplaceBooster = getBooster(detailUser.firespace);
-
-  const woodBooster = getBooster(detailUser.boost);
-
-  return new BigNumber(woodBooster.value * fireplaceBooster.value).dividedBy(
-    1e7
-  );
-};
-
 const getUser = async (near, accountId) => {
   const argument = {
     account_id: accountId,
@@ -91,20 +48,6 @@ const getUser = async (near, accountId) => {
   return detailUser;
 };
 
-const miningEarned = async (detailUser) => {
-  const remainingMiningResult = earned(detailUser);
-
-  return remainingMiningResult;
-};
-
-const getBooster = (e) => {
-  let booster = levels.find((t) => t.id == e);
-  if (!booster) return null;
-  let additionalInfo = storeFireplace.find((t) => t.id == e);
-
-  return additionalInfo ? { ...additionalInfo, ...booster } : booster;
-};
-
 const getNearBalance = async (accountId, privateKey) => {
   const account = await getAccount(accountId, privateKey);
   const Nearbalance = await account.getAccountBalance();
@@ -112,98 +55,89 @@ const getNearBalance = async (accountId, privateKey) => {
 };
 
 const processAccount = async (accountId, privateKey) => {
-  const mineAndUpdate = async () => {
+  while (true) {
     try {
-      const detailUserResult = await getUser(near, accountId);
-      const NearBalanceUser = await getNearBalance(accountId, privateKey);
-      let miningEarnedMust = await miningEarned(detailUserResult);
-      let miningProgressResult = miningProgress(detailUserResult);
-      const hotPerHour = getHotPerHourInt(detailUserResult);
+      const mineAndUpdate = async () => {
+        const NearBalanceUser = await getNearBalance(accountId, privateKey);
 
-      if (parseFloat(miningProgressResult) >= parseFloat(miningEarnedMust)) {
         twisters.put(accountId, {
           text: `
 Account ID : ${accountId}
 Near Balance :${NearBalanceUser}
-Hot In Storage : ${miningProgressResult}
-Storage Full at ${miningEarnedMust}
-Hot / Hour : ${hotPerHour}/hour 
 Status : Claiming...
 `,
         });
 
-        const account = await getAccount(accountId, privateKey);
-        await new Promise((resolve) => setTimeout(resolve, 5000));
-        const callContract = await account.functionCall({
-          contractId: "game.hot.tg",
-          methodName: "claim",
-          args: {},
-        });
+        let transactionHash = null;
+        while (transactionHash == null) {
+          try {
+            const account = await getAccount(accountId, privateKey);
+            const callContract = await account.functionCall({
+              contractId: "game.hot.tg",
+              methodName: "claim",
+              args: {},
+            });
+
+            transactionHash = callContract.transaction.hash;
+
+            twisters.put(accountId, {
+              text: `
+      Account ID : ${accountId}
+      Near Balance :${NearBalanceUser}
+      Status : Claimed ${callContract.transaction.hash}...
+      `,
+            });
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+            twisters.put(accountId, {
+              active: false,
+              removed: true,
+              text: `
+      Account ID : ${accountId}
+      Near Balance :${NearBalanceUser}
+      Status : Claimed ${callContract.transaction.hash}...
+      `,
+            });
+          } catch (contractError) {
+            twisters.put(accountId, {
+              text: `
+      Account ID : ${accountId}
+      Near Balance :${NearBalanceUser}
+      Status : ${contractError}...
+      `,
+            });
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+          }
+        }
 
         twisters.put(accountId, {
           text: `
 Account ID : ${accountId}
 Near Balance :${NearBalanceUser}
-Hot In Storage : ${miningProgressResult}
-Storage Full at ${miningEarnedMust}
-Hot / Hour : ${hotPerHour}/hour 
-Status : Claimed... ${callContract.transaction.hash}
+Status : Mining...
 `,
         });
+      };
+      await new Promise((resolve) => setTimeout(resolve, 2 * 3600 + 5 * 1000));
 
-        twisters.put(accountId, {
-          active: false,
-          removed: true,
-          text: `
-Account ID : ${accountId}
-Near Balance :${NearBalanceUser}
-Hot In Storage : ${miningProgressResult}
-Storage Full at ${miningEarnedMust}
-Hot / Hour : ${hotPerHour}/hour 
-Status : Claimed... ${callContract.transaction.hash}
-`,
-        });
-
-        await mineAndUpdate();
-        return;
-      }
-
-      miningProgressResult = miningProgress(detailUserResult);
-      twisters.put(accountId, {
-        text: `
-Account ID : ${accountId}
-Near Balance :${NearBalanceUser}
-Hot In Storage : ${miningProgressResult}
-Storage Full at ${miningEarnedMust}
-Hot / Hour : ${hotPerHour}/hour 
-Status : Mining
-`,
-      });
-
-      setTimeout(mineAndUpdate, 500);
+      await mineAndUpdate();
     } catch (error) {
-      console.log(error);
       twisters.put(accountId, {
-        active: false,
         text: `
 Account ID : ${accountId}
-Status : Error processing account, please check logs for details.
+Near Balance :${NearBalanceUser}
+Status : Error ${error}...
 `,
       });
-
-      twisters.put(accountId, {
-        removed: true,
-      });
+      await new Promise((resolve) => setTimeout(resolve, 5000));
     }
-  };
-
-  await mineAndUpdate();
+  }
 };
 
 (async () => {
   const allPromise = [];
   const promises = acc.map(async (account) => {
     const [accountId, privateKey] = account.split("|");
+
     processAccount(accountId, privateKey);
   });
 
