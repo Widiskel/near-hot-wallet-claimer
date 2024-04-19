@@ -14,6 +14,9 @@ test.near|akalsjfklasjfklasjfklasf|2
 test.near|akalsjfklasjfklasjfklasf|2
 test.near|akalsjfklasjfklasjfklasf|2
 ```
+
+## RUNNING
+Before your running this bot, make sure your hot wallet is at full storage to minimize the risk of getting ban / nerf.
 - run ```npm run claim```.
 
 ## NOTE
