@@ -4,7 +4,8 @@ Near HOT Wallet claimer for automatic claiming HOT token using Near/Lava mainnet
 
 ## Setup
 - install nodejs.
-- cd to project dir.
+- clone project ```git clone https://github.com/Widiskel/near-hot-wallet-claimer.git```
+- ```cd near-hot-wallet-claimer```
 - run ```npm install```.
 - run ```cp account-temp.js account.js``` and add ur wallet deails with this format ```accountID|privateKEY|calimDelayInHours``` , example ```test.near|akalsjfklasjfklasjfklasf|2```. it support multiple wallet
 so just write down like this
